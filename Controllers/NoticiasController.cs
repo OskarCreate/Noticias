@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Noticias.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Noticias.Controllers
 {
@@ -12,21 +10,21 @@ namespace Noticias.Controllers
     public class NoticiasController : Controller
     {
         private readonly ILogger<NoticiasController> _logger;
+        private readonly NoticiasService _noticiasService;
 
-        public NoticiasController(ILogger<NoticiasController> logger)
+        public NoticiasController(ILogger<NoticiasController> logger, NoticiasService noticiasService)
         {
             _logger = logger;
+            _noticiasService = noticiasService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        [Route("")]
+        [Route("Index")]
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View("Error!");
+            List<Post> posts = await _noticiasService.ObtenerPosts();
+            return View(posts); // Pasamos la lista directamente como modelo
         }
     }
 }

@@ -5,6 +5,7 @@ using Noticias.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient<NoticiasService>();
+builder.Services.AddScoped<NoticiasService>();
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

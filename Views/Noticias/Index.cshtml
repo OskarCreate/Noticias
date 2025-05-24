@@ -1,0 +1,106 @@
+@model List<Noticias.Models.Post>
+
+<h1>Noticias</h1>
+
+<div>
+    <h2>Lista de Posts</h2>
+    <ul id="posts-list">
+        @foreach (var post in Model)
+        {
+            <li>
+                <a href="#" class="post-link" data-post-id="@post.Id">@post.Title</a>
+            </li>
+        }
+    </ul>
+</div>
+
+<hr />
+
+<div id="post-details" style="display:none;">
+    <h2 id="post-title"></h2>
+    <p id="post-body"></p>
+    <p><strong>Autor:</strong> <span id="post-author"></span></p>
+
+    <h3>Comentarios</h3>
+    <ul id="comments-list"></ul>
+
+    <button id="btn-like">👍 Me gustó</button>
+    <button id="btn-dislike">👎 No me gustó</button>
+</div>
+
+@section Scripts {
+<script>
+    const postsList = document.getElementById('posts-list');
+    const postDetails = document.getElementById('post-details');
+    const postTitle = document.getElementById('post-title');
+    const postBody = document.getElementById('post-body');
+    const postAuthor = document.getElementById('post-author');
+    const commentsList = document.getElementById('comments-list');
+    const btnLike = document.getElementById('btn-like');
+    const btnDislike = document.getElementById('btn-dislike');
+
+    let selectedPostId = null;
+
+    postsList.addEventListener('click', async (e) => {
+        if(e.target.classList.contains('post-link')) {
+            e.preventDefault();
+            selectedPostId = e.target.dataset.postId;
+
+            // Obtener detalles del post
+            const postResponse = await fetch(`https://jsonplaceholder.typicode.com/posts/${selectedPostId}`);
+            const post = await postResponse.json();
+
+            // Mostrar título y cuerpo
+            postTitle.textContent = post.title;
+            postBody.textContent = post.body;
+
+            // Obtener autor
+            const userResponse = await fetch(`https://jsonplaceholder.typicode.com/users/${post.userId}`);
+            const user = await userResponse.json();
+            postAuthor.textContent = user.name;
+
+            // Obtener comentarios
+            const commentsResponse = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${selectedPostId}`);
+            const comments = await commentsResponse.json();
+
+            commentsList.innerHTML = '';
+            comments.forEach(c => {
+                const li = document.createElement('li');
+                li.textContent = `${c.name} (${c.email}): ${c.body}`;
+                commentsList.appendChild(li);
+            });
+
+            postDetails.style.display = 'block';
+        }
+    });
+
+    async function sendFeedback(sentimiento) {
+        if(!selectedPostId) {
+            alert('Selecciona primero un post');
+            return;
+        }
+
+        const feedback = {
+            postId: parseInt(selectedPostId),
+            sentimiento: sentimiento,
+            fecha: new Date().toISOString()
+        };
+
+        const response = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(feedback)
+        });
+
+        if(response.ok) {
+            alert(`Feedback '${sentimiento}' enviado correctamente.`);
+        } else {
+            const errorText = await response.text();
+            alert(`Error: ${errorText}`);
+        }
+    }
+
+    btnLike.addEventListener('click', () => sendFeedback('like'));
+    btnDislike.addEventListener('click', () => sendFeedback('dislike'));
+</script>
+}
