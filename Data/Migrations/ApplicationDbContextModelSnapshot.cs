@@ -19,17 +19,17 @@ namespace Noticias.Data.Migrations
 
             modelBuilder.Entity("Feedback", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int?>("PostId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("PostId")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("Fecha")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Sentimiento")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("PostId");
 
                     b.ToTable("Feedbacks");
                 });
