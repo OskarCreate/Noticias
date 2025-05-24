@@ -21,6 +21,17 @@
     <p id="post-body"></p>
     <p><strong>Autor:</strong> <span id="post-author"></span></p>
 
+    <div id="user-details" style="margin-top: 1em;">
+        <h4>Detalles del autor:</h4>
+        <p><strong>Username:</strong> <span id="user-username"></span></p>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        <p><strong>Teléfono:</strong> <span id="user-phone"></span></p>
+        <p><strong>Sitio web:</strong> <span id="user-website"></span></p>
+        <p><strong>Dirección:</strong> <span id="user-address"></span></p>
+        <p><strong>Ubicación:</strong> <span id="user-geo"></span></p>
+        <p><strong>Compañía:</strong> <span id="user-company"></span></p>
+    </div>
+
     <h3>Comentarios</h3>
     <ul id="comments-list"></ul>
 
@@ -39,10 +50,18 @@
     const btnLike = document.getElementById('btn-like');
     const btnDislike = document.getElementById('btn-dislike');
 
+    const username = document.getElementById('user-username');
+    const email = document.getElementById('user-email');
+    const phone = document.getElementById('user-phone');
+    const website = document.getElementById('user-website');
+    const address = document.getElementById('user-address');
+    const geo = document.getElementById('user-geo');
+    const company = document.getElementById('user-company');
+
     let selectedPostId = null;
 
     postsList.addEventListener('click', async (e) => {
-        if(e.target.classList.contains('post-link')) {
+        if (e.target.classList.contains('post-link')) {
             e.preventDefault();
             selectedPostId = e.target.dataset.postId;
 
@@ -50,7 +69,6 @@
             const postResponse = await fetch(`https://jsonplaceholder.typicode.com/posts/${selectedPostId}`);
             const post = await postResponse.json();
 
-            // Mostrar título y cuerpo
             postTitle.textContent = post.title;
             postBody.textContent = post.body;
 
@@ -58,6 +76,15 @@
             const userResponse = await fetch(`https://jsonplaceholder.typicode.com/users/${post.userId}`);
             const user = await userResponse.json();
             postAuthor.textContent = user.name;
+
+            username.textContent = user.username;
+            email.textContent = user.email;
+            phone.textContent = user.phone;
+            website.textContent = user.website;
+
+            address.textContent = `${user.address.street}, ${user.address.suite}, ${user.address.city}, ${user.address.zipcode}`;
+            geo.textContent = `Lat: ${user.address.geo.lat}, Lng: ${user.address.geo.lng}`;
+            company.textContent = `${user.company.name} – "${user.company.catchPhrase}", ${user.company.bs}`;
 
             // Obtener comentarios
             const commentsResponse = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${selectedPostId}`);
@@ -75,7 +102,7 @@
     });
 
     async function sendFeedback(sentimiento) {
-        if(!selectedPostId) {
+        if (!selectedPostId) {
             alert('Selecciona primero un post');
             return;
         }
@@ -88,11 +115,11 @@
 
         const response = await fetch('/api/feedback', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(feedback)
         });
 
-        if(response.ok) {
+        if (response.ok) {
             alert(`Feedback '${sentimiento}' enviado correctamente.`);
         } else {
             const errorText = await response.text();
@@ -104,3 +131,4 @@
     btnDislike.addEventListener('click', () => sendFeedback('dislike'));
 </script>
 }
+
