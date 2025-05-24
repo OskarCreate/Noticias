@@ -1,15 +1,17 @@
 @model List<Noticias.Models.Post>
 
-<h1>Noticias</h1>
+<h1 class="mb-4">📰 Noticias</h1>
 
 <div>
-    <h2>Lista de Posts</h2>
-    <ul id="posts-list">
+    <h2 class="mb-3">Lista de Posts</h2>
+    <ul id="posts-list" style="list-style: none; padding: 0;">
         @foreach (var post in Model)
         {
-            <li>
-                <a href="#" class="post-link" data-post-id="@post.Id">@post.Title</a>
-                <div class="post-details-container" style="display:none;"></div>
+            <li class="post-card" style="margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 1rem; cursor: pointer; transition: background 0.2s;">
+                <div class="post-link" data-post-id="@post.Id" style="font-weight: 600; font-size: 1.1rem; color: #333;">
+                    📌 @post.Title
+                </div>
+                <div class="post-details-container" style="display:none; margin-top: 1rem;"></div>
             </li>
         }
     </ul>
@@ -21,67 +23,63 @@
     let selectedContainer = null;
 
     postsList.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('post-link')) {
-            e.preventDefault();
+        const link = e.target.closest('.post-link');
+        if (!link) return;
 
-            const link = e.target;
-            const postId = link.dataset.postId;
-            const container = link.nextElementSibling;
+        const postId = link.dataset.postId;
+        const container = link.nextElementSibling;
 
-            // Ocultar el anterior si hay uno
-            if (selectedContainer && selectedContainer !== container) {
-                selectedContainer.style.display = 'none';
-                selectedContainer.innerHTML = '';
-            }
+        if (selectedContainer && selectedContainer !== container) {
+            selectedContainer.style.display = 'none';
+            selectedContainer.innerHTML = '';
+        }
 
-            // Si ya está visible, ocultar y salir
-            if (container.style.display === 'block') {
-                container.style.display = 'none';
-                container.innerHTML = '';
-                selectedContainer = null;
-                return;
-            }
+        if (container.style.display === 'block') {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            selectedContainer = null;
+            return;
+        }
 
-            selectedContainer = container;
+        selectedContainer = container;
 
-            // Obtener post
-            const postResponse = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`);
-            const post = await postResponse.json();
+        // Obtener post
+        const postResponse = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+        const post = await postResponse.json();
 
-            // Obtener autor
-            const userResponse = await fetch(`https://jsonplaceholder.typicode.com/users/${post.userId}`);
-            const user = await userResponse.json();
+        // Obtener autor
+        const userResponse = await fetch(`https://jsonplaceholder.typicode.com/users/${post.userId}`);
+        const user = await userResponse.json();
 
-            // Obtener comentarios
-            const commentsResponse = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`);
-            const comments = await commentsResponse.json();
+        // Obtener comentarios
+        const commentsResponse = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`);
+        const comments = await commentsResponse.json();
 
-            // Construir HTML
-            container.innerHTML = `
-                <div class="post-details" style="margin-top: 1em;">
-                    <h3>${post.title}</h3>
-                    <p>${post.body}</p>
-                    <p><strong>Autor:</strong> ${user.name}</p>
-                    <div>
-                        <h4>Detalles del autor:</h4>
-                        <p><strong>Username:</strong> ${user.username}</p>
-                        <p><strong>Email:</strong> ${user.email}</p>
-                        <p><strong>Teléfono:</strong> ${user.phone}</p>
-                        <p><strong>Sitio web:</strong> ${user.website}</p>
-                        <p><strong>Dirección:</strong> ${user.address.street}, ${user.address.suite}, ${user.address.city}, ${user.address.zipcode}</p>
-                        <p><strong>Ubicación:</strong> Lat: ${user.address.geo.lat}, Lng: ${user.address.geo.lng}</p>
-                        <p><strong>Compañía:</strong> ${user.company.name} – "${user.company.catchPhrase}", ${user.company.bs}</p>
-                    </div>
-                    <h4>Comentarios:</h4>
-                    <ul>
-                        ${comments.map(c => `<li><strong>${c.name}</strong> (${c.email}): ${c.body}</li>`).join('')}
-                    </ul>
-                    <button onclick="sendFeedback(${postId}, 'like')">👍 Me gustó</button>
+        container.innerHTML = `
+            <div style="border-top: 1px solid #ccc; padding-top: 1rem;">
+                <p>${post.body}</p>
+                <p><strong>Autor:</strong> ${user.name}</p>
+                <div style="margin-top: 0.5rem;">
+                    <h5>👤 Detalles del autor</h5>
+                    <p><strong>Username:</strong> ${user.username}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Teléfono:</strong> ${user.phone}</p>
+                    <p><strong>Sitio web:</strong> ${user.website}</p>
+                    <p><strong>Dirección:</strong> ${user.address.street}, ${user.address.suite}, ${user.address.city}, ${user.address.zipcode}</p>
+                    <p><strong>Ubicación:</strong> Lat: ${user.address.geo.lat}, Lng: ${user.address.geo.lng}</p>
+                    <p><strong>Compañía:</strong> ${user.company.name} – "${user.company.catchPhrase}", ${user.company.bs}</p>
+                </div>
+                <h5>💬 Comentarios</h5>
+                <ul style="padding-left: 1rem;">
+                    ${comments.map(c => `<li><strong>${c.name}</strong> (${c.email}): ${c.body}</li>`).join('')}
+                </ul>
+                <div style="margin-top: 1rem;">
+                    <button onclick="sendFeedback(${postId}, 'like')" style="margin-right: 0.5rem;">👍 Me gustó</button>
                     <button onclick="sendFeedback(${postId}, 'dislike')">👎 No me gustó</button>
                 </div>
-            `;
-            container.style.display = 'block';
-        }
+            </div>
+        `;
+        container.style.display = 'block';
     });
 
     async function sendFeedback(postId, sentimiento) {
@@ -106,4 +104,5 @@
     }
 </script>
 }
+
 
