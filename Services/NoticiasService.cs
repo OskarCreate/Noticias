@@ -29,3 +29,4 @@ public class NoticiasService
         return await _http.GetFromJsonAsync<List<Comment>>($"https://jsonplaceholder.typicode.com/comments?postId={postId}") ?? new();
     }
 }
+
