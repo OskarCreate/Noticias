@@ -11,8 +11,8 @@ using Noticias.Data;
 namespace Noticias.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250524021135_NuevaMigracion")]
-    partial class NuevaMigracion
+    [Migration("20250524022402_Nueva2Migracion")]
+    partial class Nueva2Migracion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,17 +22,17 @@ namespace Noticias.Data.Migrations
 
             modelBuilder.Entity("Feedback", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int?>("PostId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("PostId")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("Fecha")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Sentimiento")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("PostId");
 
                     b.ToTable("Feedbacks");
                 });
